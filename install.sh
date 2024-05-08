@@ -1,34 +1,32 @@
 #!/bin/bash
-# Zsh
-[ -f $HOME/.zshrc ] && mv $HOME/.zshrc $HOME/.zshrc.backup
-cp .zshrc $HOME/.zshrc
-cp aliases.zsh $HOME/.oh-my-zsh/custom/aliases.zsh
-cp config.zsh $HOME/.oh-my-zsh/custom/config.zsh
-cp env.zsh $HOME/.oh-my-zsh/custom/env.zsh
-cp path.zsh $HOME/.oh-my-zsh/custom/path.zsh
-cp window.zsh $HOME/.oh-my-zsh/custom/window.zsh
-cp .p10k.zsh $HOME/.p10k.zsh
 
-# .gitconfig
-[ -f $HOME/.gitconfig ] && mv $HOME/.gitconfig $HOME/.gitconfig.backup
-cp .gitconfig $HOME/.gitconfig
+install_config_files() {
+    local source_dir="$1"  # Source directory (your repository)
+    local dest_dir="$2"    # Destination directory (where you want to copy the files)
+    shift 2                # Shift the positional parameters to remove the first two (source_dir and dest_dir)
+    local filters=("$@")   # Accept an array of filters as arguments
 
-# tmux.conf
-[ -f $HOME/.tmux.conf ] && mv $HOME/.tmux.conf $HOME/.tmux.conf.backup
-cp .tmux.conf $HOME/.tmux.conf
+    # Loop through each specified filter
+    for filter in "${filters[@]}"; do
+        # Find matching configuration files in the source directory
+        find "$source_dir" -maxdepth 1 -type f -name "$filter" -print0 | while IFS= read -r -d '' config_file; do
+            # Extract the filename without the path
+            base_name=$(basename "$config_file")
 
-# Vim
-[ -f $HOME/.vimrc ] && mv $HOME/.vimrc $HOME/.vimrc.backup
-cp vimrc $HOME/.vimrc
+            # Create a backup of the existing file (if it exists)
+            if [ -f "$dest_dir/$base_name" ]; then
+                cp "$dest_dir/$base_name" "$dest_dir/$base_name.backup"
+                echo "$dest_dir/$base_name installed and backup created!"
+            fi
 
-[ -f $HOME/.vimbundle ] && mv $HOME/.vimbundle $HOME/.vimbundle.backup
-cp vimbundle $HOME/.vimbundle
+            # Copy the new configuration file
+            cp "$config_file" "$dest_dir/$base_name"
+        done
+    done
+}
 
-# Ensure dirs present
-mkdir -p $HOME/.vim/autoload
-mkdir -p $HOME/.vim/colors
+SRC_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
-# Get colors and plug
-cp colors/sonokaimore.vim $HOME/.vim/colors/sonokaimore.vim
-wget https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim -O $HOME/.vim/autoload/plug.vim
-
+install_config_files $SRC_DIR/home $HOME .gitconfig .p10k.zsh .zshrc
+install_config_files $SRC_DIR/ssh $HOME/.ssh config
+install_config_files $SRC_DIR/oh-my-zsh_custom $HOME/.oh-my-zsh/custom *.zsh
