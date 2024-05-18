@@ -1,9 +1,0 @@
-AddKeysToAgent yes
-
-Host *
-    ForwardAgent yes
-
-Host github.com
-    HostName github.com
-    User jan-car
-    IdentityFile ~/.ssh/id_rsa_github
