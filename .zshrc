@@ -4,6 +4,7 @@
 #
 # Documentation: https://github.com/romkatv/zsh4humans/blob/v5/README.md
 # Advanced tips: https://github.com/romkatv/zsh4humans/blob/master/tips.md
+# Migration of zsh4humans: https://github.com/romkatv/zsh4humans/issues/94
 
 # Periodic auto-update on Zsh startup: 'ask' or 'no'.
 # You can manually run `z4h update` to update everything.
@@ -51,7 +52,7 @@ zstyle ':z4h:ssh:*'                   enable 'yes'
 
 # Send these files over to the remote host when connecting over SSH to the
 # enabled hosts.
-# zstyle ':z4h:ssh:*' send-extra-files '~/.nanorc' '~/.env.zsh'
+zstyle ':z4h:ssh:*' send-extra-files '~/.zshaliases'
 
 # Start ssh-agent if it's not running yet.
 zstyle ':z4h:ssh-agent:' start yes
