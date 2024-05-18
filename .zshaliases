@@ -55,9 +55,6 @@ alias bat='batcat'
 
 alias top='bashtop'
 
-alias mani='compgen -c | fzf | xargs man'
-alias tldri='compgen -c | fzf | xargs tldr'
-
 
 
 ### GIT ###
