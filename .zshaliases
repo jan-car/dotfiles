@@ -10,6 +10,8 @@ wsl-notify-send() {
 
 ### SYSTEM ###
 
+alias path='echo -e ${PATH//:/\\n}'
+
 apt() {
   command nala "$@"
 }
@@ -30,10 +32,6 @@ comm -23 <(apt-mark showmanual | sort -u) <(gzip -dc /var/log/installer/initial-
 
 
 ### FILES ###
-
-# alias cd='z'
-# alias cdi='zi'
-# alias dirs='dirs -v'  # clear with dirs -c, navigate with cd ~[number]
 
 alias open-files='xdg-open .'
 

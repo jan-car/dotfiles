@@ -13,3 +13,5 @@
 [user]
     useConfigOnly = true
     name = Jan Caron
+[status]
+	showUntrackedFiles = no
