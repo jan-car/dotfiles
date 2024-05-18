@@ -144,9 +144,6 @@ export ZSH_AUTOSUGGEST_STRATEGY=(history completion)
 # Use Windows default Browser:
 export BROWSER="/mnt/c/Users/Jan.Caron/AppData/Local/Vivaldi/Application/vivaldi.exe"
 
-# Repository directory:
-export REPO_DIR="$HOME/repos"
-
 # Path:
 export PATH=$(cat <<EOF
 ${KREW_ROOT:-$HOME/.krew}/bin
@@ -154,9 +151,13 @@ ${HOME}/.local/bin
 EOF
 ):$PATH
 
-# TODO: Add /mnt/c/Users/Jan.Caron/AppData/Local/Programs/Microsoft VS Code/bin or is it there by default from Windows?
+# Init asdf:
+source ~/.asdf/asdf.sh
+
+# Source local config if present:
+if [ -f "$HOME/.zshrc_local" ]; then
+  source "$HOME/.zshrc_local"
+fi
 
 # Add own aliases:
 source ~/.zshaliases
-
-source ~/.asdf/asdf.sh

@@ -165,3 +165,11 @@ alias idea="${HOME}/.local/share/JetBrains/Toolbox/apps/intellij-idea-ultimate/b
 ### DOTFILES ###
 
 alias dotfiles='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
+
+
+
+### LOCAL CONFIG ###
+
+if [ -f "$HOME/.zshaliases_local" ]; then
+  source "$HOME/.zshaliases_local"
+fi
