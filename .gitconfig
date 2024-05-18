@@ -1,0 +1,15 @@
+[init]
+	defaultBranch = main
+[fetch]
+    prune = true
+    prunetags = true
+[pull]
+	rebase = merges
+[merge]
+    ff = false
+[core]
+    autocrlf = input
+    safecrl = false
+[user]
+    useConfigOnly = true
+    name = Jan Caron
