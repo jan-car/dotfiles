@@ -49,11 +49,8 @@ system-update() {
   sudo nala upgrade
   printf "\n${HL}pipx:${NC}\n"
   pipx upgrade-all
-  printf "\n${HL}asdf:${NC}\n"
-  for plugin in `asdf plugin list`
-  do
-    asdf plugin update $plugin
-  done
+  printf "\n${HL}mise:${NC}\n"
+  mise upgrade
   printf "\n${HL}virtualenv:${NC}\n"
   default_config_path="$HOME/.config/virtualenv/virtualenv.ini"
   printf "config file to change defaults: ${SC_YELLOW}'${VIRTUALENV_CONFIG_FILE:-$default_config_path}'${NC}\n"
@@ -192,31 +189,75 @@ ssh-load() {
 
 venv-init() {
   # Get Python version from the argument or use global version:
-  version=${1:-$(asdf current python | awk '{print $2}' | tr -d '\n')}
+  version=${1:-$(mise current python | tr -d '\n')}
   if [ -z "$version" ]; then
     printf "${SC_RED}No Python version specified and no global version found. Please specify a version!${NC}"
     echo ""
     return 1
   fi
   # Check if specified Python version is installed:
-  if ! asdf list python | grep -q "$version"; then
-    printf "${SC_RED}Python version $version is not installed! Install it using:\n${SC_YELLOW}asdf install python $version${NC}"
+  if ! mise list python | grep -q "$version"; then
+    printf "${SC_RED}Python version $version is not installed! Install it using:\n${SC_YELLOW}mise install python@$version${NC}"
     echo ""
     return 1
   fi
-  # Set local Python version via asdf:
-  asdf local python "$version"
-  # Create or overwrite .envrc to specify the python layout:
-  if ! grep -q "layout python" .envrc 2>/dev/null; then
-    echo "layout python" >> .envrc
+  # Check if  virtualenv folder already exists:
+  if [ -d ".venv" ]; then
+    printf "${SC_RED}.venv folder already exists!${NC}"
+    echo ""
+    return 1
   fi
-  # Execute direnv to allow the environment settings:
-  direnv allow
-  # Ignore .direnv in .gitignore:
-  if ! grep -q ".direnv" .gitignore 2>/dev/null; then
-    echo ".direnv/" >> .gitignore
+  # Write .mise.local.toml to configure the virtual environment if it does not yet exist:
+  if [ -f ".mise.local.toml" ]; then
+    printf "${SC_RED}.mise.local.toml already exists! Please configure manually!${NC}"
+    echo ""
+    return 1
+  else
+    printf "${HL}Generate '.mise.local.toml' file:\n${NC}"
+    echo "env_path = [\"./.venv/bin\"]\n\n[tools]\npython = \"$version\"\n\n[env]\n_.python.venv = { path = \".venv\", create = true }" | tee .mise.local.toml
+    mise trust
   fi
-  printf "${HL}Create virtual environment with Python $version...${NC}\n"
+  # Ignore .venv in .gitignore:
+  if ! grep -q ".venv" .gitignore 2>/dev/null; then
+    echo ".venv/" >> .gitignore
+  fi
+}
+
+poetry-init() {
+  # Get Python version from the argument or use global version:
+  version=${1:-$(mise current python | tr -d '\n')}
+  if [ -z "$version" ]; then
+    printf "${SC_RED}No Python version specified and no global version found. Please specify a version!${NC}"
+    echo ""
+    return 1
+  fi
+  # Check if specified Python version is installed:
+  if ! mise list python | grep -q "$version"; then
+    printf "${SC_RED}Python version $version is not installed! Install it using:\n${SC_YELLOW}mise install python@$version${NC}"
+    echo ""
+    return 1
+  fi
+  # Check if  virtualenv folder already exists:
+  if [ -d ".venv" ]; then
+    printf "${SC_RED}.venv folder already exists!${NC}"
+    echo ""
+    return 1
+  fi
+  # Write .mise.local.toml to configure the virtual environment if it does not yet exist:
+  if [ -f ".mise.local.toml" ]; then
+    printf "${SC_RED}.mise.local.toml already exists! Please configure manually!${NC}"
+    echo ""
+    return 1
+  else
+    printf "${HL}Generate '.mise.local.toml' file:\n${NC}"
+    echo "env_path = [\"./.venv/bin\"]\n\n[tools]\npython = \"$version\"\n\n[env]\nPOETRY_ACTIVE=\"true\"\nPOETRY_VIRTUALENVS_IN_PROJECT=\"true\"\nPOETRY_VIRTUALENVS_PATH=\".venv\"\n_.python.venv = { path = \".venv\", create = true }" | tee .mise.local.toml
+    mise trust
+  fi
+  # Ignore .venv in .gitignore:
+  if ! grep -q ".venv" .gitignore 2>/dev/null; then
+    echo ".venv/" >> .gitignore
+  fi
+  poetry init
 }
 
 

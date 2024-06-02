@@ -39,9 +39,9 @@ zstyle ':z4h:fzf-complete' recurse-dirs 'yes'
 zstyle ':z4h:fzf-complete' fzf-bindings tab:repeat
 
 # Enable direnv to automatically source .envrc files.
-zstyle ':z4h:direnv'         enable 'yes'
+zstyle ':z4h:direnv'         enable 'no'
 # Show "loading" and "unloading" notifications from direnv.
-zstyle ':z4h:direnv:success' notify 'yes'
+zstyle ':z4h:direnv:success' notify 'no'
 
 # The default value if none of the overrides above match the hostname.
 zstyle ':z4h:ssh:*'                   enable 'yes'
@@ -148,9 +148,8 @@ export BROWSER="/mnt/c/Users/Jan.Caron/AppData/Local/Vivaldi/Application/vivaldi
 export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
 export PATH="$HOME/.local/bin:$PATH"
 
-# Init asdf with completions plugin:
-source "${HOME}/.asdf/asdf.sh"
-source "${HOME}/.asdf/completions/asdf.bash"
+# Init mise with completions:
+eval "$(/usr/bin/mise activate zsh)"
 
 # Source local config if present:
 if [ -f "$HOME/.zshrc_local" ]; then
