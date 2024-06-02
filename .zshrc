@@ -1,10 +1,10 @@
 # Personal Zsh configuration file. It is strongly recommended to keep all
 # shell customization and configuration (including exported environment
 # variables such as PATH) in this file or in files sourced from it.
-#
+
 # Documentation: https://github.com/romkatv/zsh4humans/blob/v5/README.md
 # Advanced tips: https://github.com/romkatv/zsh4humans/blob/master/tips.md
-# Migration of zsh4humans: https://github.com/romkatv/zsh4humans/issues/94
+# Portabiliy of zsh4humans: https://github.com/romkatv/zsh4humans/issues/94
 
 # Periodic auto-update on Zsh startup: 'ask' or 'no'.
 # You can manually run `z4h update` to update everything.
@@ -144,15 +144,13 @@ export ZSH_AUTOSUGGEST_STRATEGY=(history completion)
 # Use Windows default Browser:
 export BROWSER="/mnt/c/Users/Jan.Caron/AppData/Local/Vivaldi/Application/vivaldi.exe"
 
-# Path:
-export PATH=$(cat <<EOF
-${KREW_ROOT:-$HOME/.krew}/bin
-${HOME}/.local/bin
-EOF
-):$PATH
+# Extend path:
+export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
+export PATH="$HOME/.local/bin:$PATH"
 
-# Init asdf:
-source ~/.asdf/asdf.sh
+# Init asdf with completions plugin:
+source "${HOME}/.asdf/asdf.sh"
+source "${HOME}/.asdf/completions/asdf.bash"
 
 # Source local config if present:
 if [ -f "$HOME/.zshrc_local" ]; then

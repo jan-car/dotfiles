@@ -1,4 +1,4 @@
-## WSL-NOTIFY-SEND ###
+## WSL ###
 
 wsl-notify-send() {
   MESSAGE=$1
@@ -6,11 +6,26 @@ wsl-notify-send() {
   "${HOME}/winhome/.wsl/wsl-notify-send/wsl-notify-send.exe" --category "$WSL_DISTRO_NAME" $1
 }
 
+# Use Ctrl+o to copy current terminal line to clipboard:
+copybuffer () {
+  if builtin which clip.exe &>/dev/null; then
+    printf "%s" "$BUFFER" | clip.exe
+  else
+    zle -M "clip.exe not found. Please make sure Windows executables are in the path."
+  fi
+}
+zle -N copybuffer
+bindkey -M emacs "^O" copybuffer
+bindkey -M viins "^O" copybuffer
+bindkey -M vicmd "^O" copybuffer
+
 
 
 ### SYSTEM ###
 
 alias path='echo -e ${PATH//:/\\n}'
+
+alias mkdir='mkdir -pv'
 
 apt() {
   command nala "$@"
@@ -28,6 +43,24 @@ alias list-manually-installed-packages='
 comm -23 <(apt-mark showmanual | sort -u) <(gzip -dc /var/log/installer/initial-status.gz | sed -n "s/^Package: //p" | sort -u)
 '
 # nala history --installed
+
+system-update() {
+  printf "\n${HL}packages:${NC}\n"
+  sudo nala upgrade
+  printf "\n${HL}pipx:${NC}\n"
+  pipx upgrade-all
+  printf "\n${HL}asdf:${NC}\n"
+  for plugin in `asdf plugin list`
+  do
+    asdf plugin update $plugin
+  done
+  printf "\n${HL}virtualenv:${NC}\n"
+  default_config_path="$HOME/.config/virtualenv/virtualenv.ini"
+  printf "config file to change defaults: ${SC_YELLOW}'${VIRTUALENV_CONFIG_FILE:-$default_config_path}'${NC}\n"
+  virtualenv --upgrade-embed-wheels
+  printf "\n${HL}tldr:${NC}\n"
+  tldr --update
+}
 
 
 
@@ -151,6 +184,39 @@ ssh-load() {
         echo "No file selected. Exiting."
         return  # Exit the function without stopping the whole shell
     fi
+}
+
+
+
+### PYTHON ###
+
+venv-init() {
+  # Get Python version from the argument or use global version:
+  version=${1:-$(asdf current python | awk '{print $2}' | tr -d '\n')}
+  if [ -z "$version" ]; then
+    printf "${SC_RED}No Python version specified and no global version found. Please specify a version!${NC}"
+    echo ""
+    return 1
+  fi
+  # Check if specified Python version is installed:
+  if ! asdf list python | grep -q "$version"; then
+    printf "${SC_RED}Python version $version is not installed! Install it using:\n${SC_YELLOW}asdf install python $version${NC}"
+    echo ""
+    return 1
+  fi
+  # Set local Python version via asdf:
+  asdf local python "$version"
+  # Create or overwrite .envrc to specify the python layout:
+  if ! grep -q "layout python" .envrc 2>/dev/null; then
+    echo "layout python" >> .envrc
+  fi
+  # Execute direnv to allow the environment settings:
+  direnv allow
+  # Ignore .direnv in .gitignore:
+  if ! grep -q ".direnv" .gitignore 2>/dev/null; then
+    echo ".direnv/" >> .gitignore
+  fi
+  printf "${HL}Create virtual environment with Python $version...${NC}\n"
 }
 
 
