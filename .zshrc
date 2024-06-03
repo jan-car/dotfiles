@@ -144,6 +144,9 @@ export ZSH_AUTOSUGGEST_STRATEGY=(history completion)
 # Use Windows default Browser:
 export BROWSER="/mnt/c/Users/Jan.Caron/AppData/Local/Vivaldi/Application/vivaldi.exe"
 
+# Repository directory:
+export REPO_DIR="/home/jancaron/repos"
+
 # Extend path:
 export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
 export PATH="$HOME/.local/bin:$PATH"
