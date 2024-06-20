@@ -93,7 +93,7 @@ alias top='bashtop'
 alias repo-sync='
 pushd -q ${REPO_DIR}
 for repo in `find -maxdepth 5 -type d -name .git`; do
-  (echo -e "${HL}Refreshing $repo:h${NC}"; cd $repo:h; hub sync)
+  (echo -e "${HL}Refreshing $repo:h${NC}"; cd $repo:h; hub sync; git fetch --tags --force)
 done
 popd -q
 '
@@ -101,7 +101,7 @@ popd -q
 alias repo-sync-gc='
 pushd -q ${REPO_DIR}
 for repo in `find -maxdepth 5 -type d -name .git`; do
-  (echo -e "${HL}Refreshing and cleaning up $repo:h${NC}"; cd $repo:h; hub sync; git gc --aggressive --prune=now)
+  (echo -e "${HL}Refreshing and cleaning up $repo:h${NC}"; cd $repo:h; hub sync; git fetch --tags --force; git gc --aggressive --prune=now)
 done
 popd -q
 '
@@ -111,6 +111,11 @@ alias git-tag-update='git fetch origin --tags --force'
 alias git-list-merged-branches='git branch --merged master --no-color | grep -Ev "master|stable|main"'
 alias git-delete-merged-branches='git branch --merged master --no-color | grep -Ev "master|stable|main" | xargs git branch -d'
 
+search-repos() {
+  for repo in `find ${REPO_DIR} -maxdepth 6 -type d -name .git`; do
+    (echo -e "${HL}Searching $repo:h${NC}"; cd $repo:h; git log --oneline --all | rg "$1")
+  done
+}
 
 
 ### DOCKER ###

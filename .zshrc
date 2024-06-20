@@ -52,7 +52,7 @@ zstyle ':z4h:ssh:*'                   enable 'yes'
 
 # Send these files over to the remote host when connecting over SSH to the
 # enabled hosts.
-zstyle ':z4h:ssh:*' send-extra-files '~/.zshaliases'
+# zstyle ':z4h:ssh:*' send-extra-files '~/.zshaliases'
 
 # Start ssh-agent if it's not running yet.
 zstyle ':z4h:ssh-agent:' start yes
@@ -120,6 +120,7 @@ alias tree='tree -a -I .git'
 
 # Add flags to existing aliases.
 alias ls="${aliases[ls]:-ls} -A"
+alias ll="ls -hal"
 
 # Set shell options: http://zsh.sourceforge.net/Doc/Release/Options.html.
 setopt glob_dots  # no special treatment for file names with a leading dot
@@ -152,7 +153,9 @@ export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
 export PATH="$HOME/.local/bin:$PATH"
 
 # Init mise with completions:
-eval "$(/usr/bin/mise activate zsh)"
+if [ -f "/usr/bin/mise" ]; then
+  eval "$(/usr/bin/mise activate zsh)"
+fi
 
 # Source local config if present:
 if [ -f "$HOME/.zshrc_local" ]; then
@@ -160,4 +163,11 @@ if [ -f "$HOME/.zshrc_local" ]; then
 fi
 
 # Add own aliases:
-source ~/.zshaliases
+if [ -f "$HOME/.zshaliases" ]; then
+  source ~/.zshaliases
+fi
+
+# Source local aliases if present:
+if [ -f "$HOME/.zshaliases_local" ]; then
+  source "$HOME/.zshaliases_local"
+fi
