@@ -178,7 +178,7 @@ ssh-load() {
   ssh_folder="$HOME/.ssh"
     # Argument is not provided, offer fuzzy find using fzf
     echo "No argument provided. Please select a file from the '$ssh_folder' folder:"
-    selected_file=$(find "$ssh_folder" -type f -name 'id_rsa_*' ! -name '*.pub' | fzf)
+    selected_file=$(find "$ssh_folder" -type f -name '*id_rsa*' ! -name '*.pub' | fzf)
     if [[ -n "$selected_file" ]]; then
         echo "Selected file: $selected_file"
         eval `keychain --eval --agents ssh $selected_file`
