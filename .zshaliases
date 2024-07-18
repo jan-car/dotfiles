@@ -121,16 +121,16 @@ search-repos() {
 ### DOCKER ###
 
 alias docker-check='
-docker ps --format "table {{.ID}}\t{{.Names}}\t{{.Size}}\t{{.RunningFor}}\t{{.Status}}"
+docker ps --format "table {{.ID}}\t{{.Names}}\t{{.Image}}\t{{.Size}}\t{{.RunningFor}}\t{{.Status}}" | docker-color-output
 '
 alias docker-check-slim='
-docker ps --format "table {{.ID}}\t{{.Names}}\t{{.Status}}"
+docker ps --format "table {{.ID}}\t{{.Names}}\t{{.Status}}" | docker-color-output
 '
 alias docker-monitor='
-watch "docker ps --format \"table {{.ID}}\t{{.Names}}\t{{.Size}}\t{{.RunningFor}}\t{{.Status}}\""
+watch --color "docker ps --format \"table {{.ID}}\t{{.Names}}\t{{.Image}}\t{{.Size}}\t{{.RunningFor}}\t{{.Status}}\" | docker-color-output"
 '
 alias docker-monitor-slim='
-watch "docker ps --format \"table {{.ID}}\t{{.Names}}\t{{.Status}}\""
+watch --color "docker ps --format \"table {{.ID}}\t{{.Names}}\t{{.Status}}\" | docker-color-output"
 '
 alias docker-kill-all='
 docker stop $(docker ps -a -q)
