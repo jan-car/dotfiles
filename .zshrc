@@ -157,17 +157,12 @@ if [ -f "/usr/bin/mise" ]; then
   eval "$(/usr/bin/mise activate zsh)"
 fi
 
-# Source local config if present:
+# Source local configuration if present:
 if [ -f "$HOME/.zshrc_local" ]; then
   source "$HOME/.zshrc_local"
 fi
 
-# Add own aliases:
+# Add custom aliases:
 if [ -f "$HOME/.zshaliases" ]; then
   source ~/.zshaliases
-fi
-
-# Source local aliases if present:
-if [ -f "$HOME/.zshaliases_local" ]; then
-  source "$HOME/.zshaliases_local"
 fi

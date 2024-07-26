@@ -27,18 +27,6 @@ alias path='echo -e ${PATH//:/\\n}'
 
 alias mkdir='mkdir -pv'
 
-apt() {
-  command nala "$@"
-}
-sudo() {
-  if [ "$1" = "apt" ]; then
-    shift
-    command sudo nala "$@"
-  else
-    command sudo "$@"
-  fi
-}
-
 alias list-manually-installed-packages='
 comm -23 <(apt-mark showmanual | sort -u) <(gzip -dc /var/log/installer/initial-status.gz | sed -n "s/^Package: //p" | sort -u)
 '
@@ -46,7 +34,7 @@ comm -23 <(apt-mark showmanual | sort -u) <(gzip -dc /var/log/installer/initial-
 
 system-update() {
   printf "\n${HL}packages:${NC}\n"
-  sudo nala upgrade
+  sudo nala upgrade -y
   printf "\n${HL}pipx:${NC}\n"
   pipx upgrade-all
   printf "\n${HL}mise:${NC}\n"
@@ -176,16 +164,22 @@ alias ssh-clear='keychain --clear'
 
 ssh-load() {
   ssh_folder="$HOME/.ssh"
-    # Argument is not provided, offer fuzzy find using fzf
-    echo "No argument provided. Please select a file from the '$ssh_folder' folder:"
-    selected_file=$(find "$ssh_folder" -type f -name '*id_rsa*' ! -name '*.pub' | fzf)
-    if [[ -n "$selected_file" ]]; then
-        echo "Selected file: $selected_file"
-        eval `keychain --eval --agents ssh $selected_file`
-    else
-        echo "No file selected. Exiting."
-        return  # Exit the function without stopping the whole shell
-    fi
+  # Argument is not provided, offer fuzzy find using fzf
+  echo "No argument provided. Please select a file from the '$ssh_folder' folder:"
+  selected_file=$(find "$ssh_folder" -type f -name '*id_rsa*' ! -name '*.pub' | fzf)
+  if [[ -n "$selected_file" ]]; then
+      echo "Selected file: $selected_file"
+      eval `keychain --eval --agents ssh $selected_file`
+  else
+      echo "No file selected. Exiting."
+      return  # Exit the function without stopping the whole shell
+  fi
+}
+
+ssh-load-all() {
+  ssh_folder="$HOME/.ssh"
+  filenames=$(find "$ssh_folder" -type f -name '*id_rsa*' ! -name '*.pub')
+  eval `keychain --eval --agents ssh $filenames`
 }
 
 
