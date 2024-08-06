@@ -125,8 +125,7 @@ alias ll="ls -hal"
 # Set shell options: http://zsh.sourceforge.net/Doc/Release/Options.html.
 setopt glob_dots  # no special treatment for file names with a leading dot
 setopt auto_menu  # require NO extra TAB press to open the completion menu
-
-
+setopt complete_aliases
 
 ### GENERAL PERSONAL CONFIG ###
 
@@ -141,9 +140,6 @@ HL=$SC_GREEN # Highlight (for easy switching)
 
 # autosuggest strategy config:
 export ZSH_AUTOSUGGEST_STRATEGY=(history completion)
-
-# Use Windows default Browser:
-export BROWSER="/mnt/c/Users/Jan.Caron/AppData/Local/Vivaldi/Application/vivaldi.exe"
 
 # Repository directory:
 export REPO_DIR="/home/jancaron/repos"

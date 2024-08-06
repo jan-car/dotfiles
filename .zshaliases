@@ -131,30 +131,32 @@ docker system df
 
 ### KUBECTL ###
 
-alias k='kubectl'
-ki() {
-  resource=$1
-  if [ -z "$resource" ]; then
-    echo "Error: Please specify the type of resource you want to ge (e.g. pods, service, etc.)."
-    return 1
-  fi
-  shift
-  command="$@"
-  if [ -z "$command" ]; then
-    echo "Error: Command cannot be empty."
-    return 1
-  fi
-  echo "For resource: '$resource', execute command 'kubectl $command <RESOURCE> -n <NAMESPACE>'"
-  kubectl get $resource -A --no-headers | fzf | awk '{print $2, $1}' | xargs -n 2 zsh -c "kubectl $command \$0 -n \$1"
-}
-k-port-forward() {
-  port=$1
-  if [ -z "$port" ]; then
-    echo "Error: Please specify a port (e.g. 19200 for ES)"
-    return 1
-  fi
-  kubectl get svc | fzf | xargs -n 1 zsh -c "kubectl port-forward services/\$0 $port:$port"
-}
+alias kubectl='kubecolor'
+
+# ki() {
+#   resource=$1
+#   if [ -z "$resource" ]; then
+#     echo "Error: Please specify the type of resource you want to get (e.g. pods, service, etc.)."
+#     return 1
+#   fi
+#   shift
+#   command="$@"
+#   if [ -z "$command" ]; then
+#     echo "Error: Command cannot be empty."
+#     return 1
+#   fi
+#   echo "For resource: '$resource', execute command 'kubectl $command <RESOURCE> -n <NAMESPACE>'"
+#   kubecolor get $resource -A --no-headers | fzf | awk '{print $2, $1}' | xargs -n 2 zsh -c "kubecolor $command \$0 -n \$1"
+# }
+
+# k-port-forward() {
+#   port=$1
+#   if [ -z "$port" ]; then
+#     echo "Error: Please specify a port (e.g. 19200 for ES)"
+#     return 1
+#   fi
+#   kubecolor get svc | fzf | xargs -n 1 zsh -c "kubecolor port-forward services/\$0 $port:$port"
+# }
 
 
 
