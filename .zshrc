@@ -141,9 +141,6 @@ HL=$SC_GREEN # Highlight (for easy switching)
 # autosuggest strategy config:
 export ZSH_AUTOSUGGEST_STRATEGY=(history completion)
 
-# Repository directory:
-export REPO_DIR="/home/jancaron/repos"
-
 # Extend path:
 export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
 export PATH="$HOME/.local/bin:$PATH"
