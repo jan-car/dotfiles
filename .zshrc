@@ -145,6 +145,12 @@ export ZSH_AUTOSUGGEST_STRATEGY=(history completion)
 export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
 export PATH="$HOME/.local/bin:$PATH"
 
+# Use Windows default Browser (OVERWRITE IN .zshrc_local):
+# export BROWSER="/path/to/windows/browser.exe"
+
+# Repository directory (OVERWRITE IN .zshrc_local):
+# export REPO_DIR="/path/to/repo/directory"
+
 # Init mise with completions:
 if [ -f "/usr/bin/mise" ]; then
   eval "$(/usr/bin/mise activate zsh)"
