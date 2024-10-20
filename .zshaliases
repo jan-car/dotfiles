@@ -265,8 +265,10 @@ poetry-init() {
 
 ### INTELLIJ ###
 
-alias jetbrains-toolbox="${HOME}/.local/share/JetBrains/Toolbox/bin/jetbrains-toolbox"
-alias idea="${HOME}/.local/share/JetBrains/Toolbox/apps/intellij-idea-ultimate/bin/idea.sh"
+# Hardware acceleration doesn't work: https://github.com/cascadium/wsl-windows-toolbar-launcher/issues/43#issuecomment-1416264763
+alias jetbrains-toolbox="LIBGL_ALWAYS_SOFTWARE=1 ${HOME}/.local/share/JetBrains/Toolbox/bin/jetbrains-toolbox"
+alias pycharm="LIBGL_ALWAYS_SOFTWARE=1 ${HOME}/.local/share/JetBrains/Toolbox/apps/pycharm-community/bin/pycharm.sh"
+alias idea="LIBGL_ALWAYS_SOFTWARE=1 ${HOME}/.local/share/JetBrains/Toolbox/apps/intellij-idea-ultimate/bin/idea.sh"
 
 
 
