@@ -38,6 +38,7 @@ system-update() {
   printf "\n${HL}pipx:${NC}\n"
   pipx upgrade-all
   printf "\n${HL}mise:${NC}\n"
+  mise self-update
   mise upgrade
   printf "\n${HL}virtualenv:${NC}\n"
   default_config_path="$HOME/.config/virtualenv/virtualenv.ini"
@@ -47,16 +48,19 @@ system-update() {
   tldr --update
 }
 
+alias ncdu='ncdu --color dark -e'
+alias ncdu-all='ncdu / --color dark -e --exclude /mnt/c'
+
 
 
 ### FILES ###
 
 alias open-files='xdg-open .'
 
-alias ls='exa --all --icons --group-directories-first --sort type --across'
-alias ll='exa --all --icons --group-directories-first --sort type --long --header'
+alias ls='eza --all --icons --group-directories-first --sort type --across'
+alias ll='eza --all --icons --group-directories-first --sort type --long --header'
 lt() {
-  exa --all --icons --group-directories-first --long --header --tree --level=${1:-2}
+  eza --all --icons --group-directories-first --long --header --tree --level=${1:-2}
 }
 
 alias fsizes='du -ah . | sort -hr | head -n 10'
@@ -133,30 +137,7 @@ docker system df
 
 alias kubectl='kubecolor'
 
-# ki() {
-#   resource=$1
-#   if [ -z "$resource" ]; then
-#     echo "Error: Please specify the type of resource you want to get (e.g. pods, service, etc.)."
-#     return 1
-#   fi
-#   shift
-#   command="$@"
-#   if [ -z "$command" ]; then
-#     echo "Error: Command cannot be empty."
-#     return 1
-#   fi
-#   echo "For resource: '$resource', execute command 'kubectl $command <RESOURCE> -n <NAMESPACE>'"
-#   kubecolor get $resource -A --no-headers | fzf | awk '{print $2, $1}' | xargs -n 2 zsh -c "kubecolor $command \$0 -n \$1"
-# }
-
-# k-port-forward() {
-#   port=$1
-#   if [ -z "$port" ]; then
-#     echo "Error: Please specify a port (e.g. 19200 for ES)"
-#     return 1
-#   fi
-#   kubecolor get svc | fzf | xargs -n 1 zsh -c "kubecolor port-forward services/\$0 $port:$port"
-# }
+alias k-monitor-pods='watch -c "kubecolor get pods --force-colors"'
 
 
 
@@ -189,6 +170,12 @@ ssh-load-all() {
 ### PYTHON ###
 
 venv-init() {
+  # Check if virtualenv folder already exists:
+  if [ -d ".venv" ]; then
+    printf "${SC_RED}Error: '.venv' folder already exists. Please remove it or use a different directory.${NC}\n"
+    echo ""
+    return 1
+  fi
   # Get Python version from the argument or use global version:
   version=${1:-$(mise current python | tr -d '\n')}
   if [ -z "$version" ]; then
@@ -198,67 +185,43 @@ venv-init() {
   fi
   # Check if specified Python version is installed:
   if ! mise list python | grep -q "$version"; then
-    printf "${SC_RED}Python version $version is not installed! Install it using:\n${SC_YELLOW}mise install python@$version${NC}"
-    echo ""
-    return 1
-  fi
-  # Check if  virtualenv folder already exists:
-  if [ -d ".venv" ]; then
-    printf "${SC_RED}.venv folder already exists!${NC}"
-    echo ""
-    return 1
+    printf "${SC_YELLOW}Python version $version is not installed. Do you want to install it now? (y/n): ${NC}"
+    read -r response
+    if [[ "$response" =~ ^[Yy]$ ]]; then
+      printf "${HL}Installing Python version $version (and syncing it to uv)...${NC}\n"
+      mise install python@$version
+      mise sync python --uv
+    else
+      printf "${SC_RED}Installation aborted. Exiting.${NC}\n"
+      echo ""
+      return 1
+    fi
   fi
   # Write .mise.local.toml to configure the virtual environment if it does not yet exist:
   if [ -f ".mise.local.toml" ]; then
-    printf "${SC_RED}.mise.local.toml already exists! Please configure manually!${NC}"
+    printf "${SC_RED}.mise.local.toml already exists! Please remove or configure it manually!${NC}"
     echo ""
     return 1
   else
     printf "${HL}Generate '.mise.local.toml' file:\n${NC}"
-    echo "env_path = [\"./.venv/bin\"]\n\n[tools]\npython = \"$version\"\n\n[env]\n_.python.venv = { path = \".venv\", create = true }" | tee .mise.local.toml
-    mise trust
+    echo "env_path = [\"./.venv/bin\"]\n\n[tools]\npython = \"$version\"\n\n[env]\n_.python.venv = { path = \".venv\", create = true }\n\n[settings]\npython.uv_venv_auto = true" | tee .mise.local.toml
+    mise trust -q
   fi
-  # Ignore .venv in .gitignore:
+  # Ignore .venv and .mise.local.toml in .gitignore:
   if ! grep -q ".venv" .gitignore 2>/dev/null; then
     echo ".venv/" >> .gitignore
+  fi
+  if ! grep -q ".mise.local.toml" .gitignore 2>/dev/null; then
+    echo ".mise.local.toml" >> .gitignore
   fi
 }
 
-poetry-init() {
-  # Get Python version from the argument or use global version:
+uv-init() {
+  # Create a virtual environment using mise (see above):
+  venv-init "$@"
+  echo "${HL}Initializing uv project...${NC}"
   version=${1:-$(mise current python | tr -d '\n')}
-  if [ -z "$version" ]; then
-    printf "${SC_RED}No Python version specified and no global version found. Please specify a version!${NC}"
-    echo ""
-    return 1
-  fi
-  # Check if specified Python version is installed:
-  if ! mise list python | grep -q "$version"; then
-    printf "${SC_RED}Python version $version is not installed! Install it using:\n${SC_YELLOW}mise install python@$version${NC}"
-    echo ""
-    return 1
-  fi
-  # Check if  virtualenv folder already exists:
-  if [ -d ".venv" ]; then
-    printf "${SC_RED}.venv folder already exists!${NC}"
-    echo ""
-    return 1
-  fi
-  # Write .mise.local.toml to configure the virtual environment if it does not yet exist:
-  if [ -f ".mise.local.toml" ]; then
-    printf "${SC_RED}.mise.local.toml already exists! Please configure manually!${NC}"
-    echo ""
-    return 1
-  else
-    printf "${HL}Generate '.mise.local.toml' file:\n${NC}"
-    echo "env_path = [\"./.venv/bin\"]\n\n[tools]\npython = \"$version\"\n\n[env]\nPOETRY_ACTIVE=\"true\"\nPOETRY_VIRTUALENVS_IN_PROJECT=\"true\"\nPOETRY_VIRTUALENVS_PATH=\".venv\"\n_.python.venv = { path = \".venv\", create = true }" | tee .mise.local.toml
-    mise trust
-  fi
-  # Ignore .venv in .gitignore:
-  if ! grep -q ".venv" .gitignore 2>/dev/null; then
-    echo ".venv/" >> .gitignore
-  fi
-  poetry init
+  uv init --python "$version"
 }
 
 
