@@ -33,17 +33,15 @@ comm -23 <(apt-mark showmanual | sort -u) <(gzip -dc /var/log/installer/initial-
 # nala history --installed
 
 system-update() {
-  printf "\n${HL}packages:${NC}\n"
+  printf "\n${HL}nala (apt):${NC}\n"
   sudo nala upgrade -y
-  printf "\n${HL}pipx:${NC}\n"
-  pipx upgrade-all
+  printf "\n${HL}snap:${NC}\n"
+  sudo snap refresh
   printf "\n${HL}mise:${NC}\n"
-  mise self-update
   mise upgrade
-  printf "\n${HL}virtualenv:${NC}\n"
-  default_config_path="$HOME/.config/virtualenv/virtualenv.ini"
-  printf "config file to change defaults: ${SC_YELLOW}'${VIRTUALENV_CONFIG_FILE:-$default_config_path}'${NC}\n"
-  virtualenv --upgrade-embed-wheels
+  mise sync python --uv
+  printf "\n${HL}uv:${NC}\n"
+  uv tool upgrade --all
   printf "\n${HL}tldr:${NC}\n"
   tldr --update
 }
@@ -110,6 +108,7 @@ search-repos() {
 }
 
 
+
 ### DOCKER ###
 
 alias docker-check='
@@ -138,7 +137,6 @@ docker system df
 alias kubectl='kubecolor'
 
 alias k-monitor-pods='watch -c "kubecolor get pods --force-colors"'
-
 
 
 ### SSH ###
