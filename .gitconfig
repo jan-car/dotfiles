@@ -1,10 +1,10 @@
 [init]
-	defaultBranch = main
+    defaultBranch = main
 [fetch]
     prune = true
     prunetags = true
 [pull]
-	rebase = merges
+	rebase = true
 [merge]
     ff = false
 [core]
@@ -14,4 +14,4 @@
     useConfigOnly = true
     name = Jan Caron
 [status]
-	showUntrackedFiles = no
+    showUntrackedFiles = no
